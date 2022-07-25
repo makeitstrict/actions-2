@@ -1,0 +1,60 @@
+name: 'Running tests'
+
+on:
+  workflow_call:
+
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        php: [ 8.0, 8.1, 8.2 ]
+        dependencies: [ lowest, locked, highest ]
+        platform: [ ubuntu-latest ]
+    name: 'Testing on PHP ${{ matrix.php }}. Dependencies: ${{ matrix.dependencies }}'
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: xdebug, mbstring
+          tools: composer
+
+      - name: 'Validate composer.json and composer.lock'
+        run: composer validate --strict
+
+      - name: 'Determine composer cache directory'
+        id: composer-cache
+        run: echo "::set-output name=directory::$(composer config cache-dir)"
+
+      - name: 'Install lowest dependencies from composer.json'
+        if: matrix.dependencies == 'lowest'
+        run: composer update --no-interaction --no-progress --prefer-lowest
+
+      - name: 'Install locked dependencies from composer.lock'
+        if: matrix.dependencies == 'locked'
+        run: composer install --no-interaction --no-progress
+
+      - name: 'Install highest dependencies from composer.json'
+        if: matrix.dependencies == 'highest'
+        run: composer update --no-interaction --no-progress
+
+      - name: 'Show installed packages'
+        run: composer info --direct --tree
+
+      - run: make ci
+
+      - run: vendor/bin/phpunit
+
+      - run: vendor/bin/infection --threads=4
+
+      - uses: codecov/codecov-action@v3
+        with:
+          directory: tests/_output/phpunit/coverage
+          flags: unit
+          name: 'Coverage on PHP ${{ matrix.php }}'
+          verbose: true # optional (default = false)
+
+

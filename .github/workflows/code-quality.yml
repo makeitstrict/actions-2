@@ -1,0 +1,32 @@
+name: 'Code quality checks'
+
+on:
+  workflow_call:
+
+jobs:
+  psalm:
+    name: 'Generate Psalm Report'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          tools: composer, psalm
+
+      - run: make ci
+
+      - name: 'Validate composer.json and composer.lock'
+        run: composer validate --strict
+
+      - name: 'Install locked dependencies from composer.lock'
+        run: composer install --no-interaction --no-progress
+
+      - name: 'Running Psalm'
+        continue-on-error: true
+        run: vendor/bin/psalm --output-format=github --report=/tmp/psalm/report.sarif
+
+      - name: 'Upload results to GitHub'
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: /tmp/psalm/report.sarif
