@@ -48,7 +48,9 @@ jobs:
             "--config=${{ inputs.configuration }}" \
             "--memory-limit=-1" \
             "--threads=$(nproc)" \
+            "--long-progress" \
             "--no-cache" \
+            "--output-format=github" \
             "--report=${{ env.REPORT_DIR }}json.json" \
             "--report=${{ env.REPORT_DIR }}psalm.xml" \
             "--report=${{ env.REPORT_DIR }}psalm.txt" \
@@ -65,6 +67,7 @@ jobs:
           "${dynamic_command[@]}"
 
       - uses: actions/upload-artifact@v3
+        if: always()
         with:
           name: reports
           path: ${{ env.REPORT_DIR }}
