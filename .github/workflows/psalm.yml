@@ -5,7 +5,7 @@ on:
     inputs:
       configuration:
         type: string
-        default: './psalm.xml'
+        default: './psalm.dist.xml'
       version:
         type: string
         default: 'latest'
