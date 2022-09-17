@@ -37,7 +37,7 @@ jobs:
       - run: |
           wget \
             -O /usr/local/bin/psalm \
-            https://github.com/vimeo/psalm/releases/download/${{ inputs.configuration }}/psalm.phar && \
+            https://github.com/vimeo/psalm/releases/download/${{ inputs.version }}/psalm.phar && \
           chmod +x /usr/local/bin/psalm && \
           psalm --version
 
