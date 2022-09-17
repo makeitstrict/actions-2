@@ -1,0 +1,60 @@
+name: 'Psalm'
+
+on:
+  workflow_call:
+    inputs:
+      configuration:
+        type: string
+        default: './psalm.xml'
+        required: true
+      reports-artifact-name:
+        type: string
+        default: 'psalm-reports'
+        required: true
+
+env:
+  REPORT_DIR: /tmp/${{ github.run_id }}/
+
+jobs:
+  run:
+    permissions:
+      contents: read
+    name: 'Running Psalm'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          tools: composer
+
+      - run: composer install --no-interaction --no-progress
+
+      - run: |
+          mkdir -p ${{ env.REPORT_DIR }} && \
+          dynamic_command=( \
+            "psalm" \
+            "--config" "${{ inputs.configuration }}" \
+            "--memory-limit" "0" \
+            "--threads" "$(nproc)" \
+            "--no-cache" \
+            "--report" "${{ env.REPORT_DIR }}json.json" \
+            "--report" "${{ env.REPORT_DIR }}psalm.xml" \
+            "--report" "${{ env.REPORT_DIR }}psalm.txt" \
+            "--report" "${{ env.REPORT_DIR }}psalm.emacs" \
+            "--report" "${{ env.REPORT_DIR }}psalm.pylint" \
+            "--report" "${{ env.REPORT_DIR }}psalm.console" \
+            "--report" "${{ env.REPORT_DIR }}psalm.sarif" \
+            "--report" "${{ env.REPORT_DIR }}checkstyle.xml" \
+            "--report" "${{ env.REPORT_DIR }}sonarqube.json" \
+            "--report" "${{ env.REPORT_DIR }}codeclimate.json" \
+            "--report" "${{ env.REPORT_DIR }}summary.json" \
+            "--report" "${{ env.REPORT_DIR }}junit.xml" \
+          ) && \
+          "${dynamic_command[@]}"
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: reports
+          path: ${{ env.REPORT_DIR }}
+          if-no-files-found: error
