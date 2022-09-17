@@ -46,7 +46,7 @@ jobs:
           dynamic_command=( \
             "psalm" \
             "--config" "${{ inputs.configuration }}" \
-            "--memory-limit" "0" \
+            "--memory-limit" "-1" \
             "--threads" "$(nproc)" \
             "--no-cache" \
             "--report" "${{ env.REPORT_DIR }}json.json" \
