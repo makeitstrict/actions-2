@@ -13,6 +13,9 @@ on:
       reports-artifact-name:
         type: string
         default: 'psalm-reports'
+      respect-psalm-error:
+        type: boolean
+        default: true
 
 env:
   REPORT_DIR: /tmp/${{ github.run_id }}/
@@ -41,7 +44,8 @@ jobs:
           chmod +x /usr/local/bin/psalm && \
           psalm --version
 
-      - run: |
+      - name: 'Executing Psalm'
+        run: |
           mkdir -p ${{ env.REPORT_DIR }} && \
           dynamic_command=( \
             "psalm" \
@@ -58,11 +62,16 @@ jobs:
             "--report=${{ env.REPORT_DIR }}summary.json" \
             "--report=${{ env.REPORT_DIR }}junit.xml" \
           ) && \
-          "${dynamic_command[@]}"
+          if [[ '${{ inputs.respect-psalm-error }}' = 'true' ]]
+          then
+            "${dynamic_command[@]}"
+          else
+            "${dynamic_command[@]}" 2> /dev/null
+          fi
 
       - uses: actions/upload-artifact@v3
         if: always()
         with:
-          name: reports
+          name: ${{ inputs.reports-artifact-name }}
           path: ${{ env.REPORT_DIR }}
           if-no-files-found: error
