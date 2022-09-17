@@ -6,6 +6,10 @@ on:
       configuration:
         type: string
         default: './psalm.xml'
+      version:
+        type: string
+        default: 'latest'
+        required: true
       reports-artifact-name:
         type: string
         default: 'psalm-reports'
@@ -26,7 +30,16 @@ jobs:
         with:
           tools: composer
 
-      - run: composer install --no-interaction --no-progress
+      - run: |
+          composer install --no-interaction --no-progress --prefer-dist && \
+          composer dump-autoload --optimize --strict-psr
+
+      - run: |
+          wget \
+            -O /usr/local/bin/psalm \
+            https://github.com/vimeo/psalm/releases/download/${{ inputs.configuration }}/psalm.phar && \
+          chmod +x /usr/local/bin/psalm && \
+          psalm --version
 
       - run: |
           mkdir -p ${{ env.REPORT_DIR }} && \
