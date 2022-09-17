@@ -13,9 +13,6 @@ on:
       reports-artifact-name:
         type: string
         default: 'psalm-reports'
-      respect-psalm-error:
-        type: boolean
-        default: true
 
 env:
   REPORT_DIR: /tmp/${{ github.run_id }}/
@@ -29,24 +26,27 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - uses: shivammathur/setup-php@v2
+      - name: 'Installing PHP'
+        uses: shivammathur/setup-php@v2
         with:
           tools: composer
 
-      - run: |
+      - name: 'Installing dependencies'
+        run: |
           composer install --no-interaction --no-progress --prefer-dist && \
           composer dump-autoload --optimize --strict-psr
 
-      - run: |
+      - name: 'Installing Psalm'
+        run: |
           wget \
             -O /usr/local/bin/psalm \
             https://github.com/vimeo/psalm/releases/${{ inputs.version }}/download/psalm.phar && \
           chmod +x /usr/local/bin/psalm && \
-          psalm --version
+          psalm --version && \
+          mkdir -p ${{ env.REPORT_DIR }}
 
       - name: 'Executing Psalm'
         run: |
-          mkdir -p ${{ env.REPORT_DIR }} && \
           dynamic_command=( \
             "psalm" \
             "--config=${{ inputs.configuration }}" \
@@ -62,12 +62,7 @@ jobs:
             "--report=${{ env.REPORT_DIR }}summary.json" \
             "--report=${{ env.REPORT_DIR }}junit.xml" \
           ) && \
-          if [[ '${{ inputs.respect-psalm-error }}' = 'true' ]]
-          then
-            "${dynamic_command[@]}"
-          else
-            "${dynamic_command[@]}" 2> /dev/null
-          fi
+          "${dynamic_command[@]}"
 
       - uses: actions/upload-artifact@v3
         if: always()
