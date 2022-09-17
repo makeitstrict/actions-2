@@ -6,11 +6,9 @@ on:
       configuration:
         type: string
         default: './psalm.xml'
-        required: true
       reports-artifact-name:
         type: string
         default: 'psalm-reports'
-        required: true
 
 env:
   REPORT_DIR: /tmp/${{ github.run_id }}/
