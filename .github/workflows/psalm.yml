@@ -47,20 +47,20 @@ jobs:
             "psalm" \
             "--config=${{ inputs.configuration }}" \
             "--memory-limit=-1" \
-            "--threads" "$(nproc)" \
+            "--threads=$(nproc)" \
             "--no-cache" \
-            "--report" "${{ env.REPORT_DIR }}json.json" \
-            "--report" "${{ env.REPORT_DIR }}psalm.xml" \
-            "--report" "${{ env.REPORT_DIR }}psalm.txt" \
-            "--report" "${{ env.REPORT_DIR }}psalm.emacs" \
-            "--report" "${{ env.REPORT_DIR }}psalm.pylint" \
-            "--report" "${{ env.REPORT_DIR }}psalm.console" \
-            "--report" "${{ env.REPORT_DIR }}psalm.sarif" \
-            "--report" "${{ env.REPORT_DIR }}checkstyle.xml" \
-            "--report" "${{ env.REPORT_DIR }}sonarqube.json" \
-            "--report" "${{ env.REPORT_DIR }}codeclimate.json" \
-            "--report" "${{ env.REPORT_DIR }}summary.json" \
-            "--report" "${{ env.REPORT_DIR }}junit.xml" \
+            "--report=${{ env.REPORT_DIR }}json.json" \
+            "--report=${{ env.REPORT_DIR }}psalm.xml" \
+            "--report=${{ env.REPORT_DIR }}psalm.txt" \
+            "--report=${{ env.REPORT_DIR }}psalm.emacs" \
+            "--report=${{ env.REPORT_DIR }}psalm.pylint" \
+            "--report=${{ env.REPORT_DIR }}psalm.console" \
+            "--report=${{ env.REPORT_DIR }}psalm.sarif" \
+            "--report=${{ env.REPORT_DIR }}checkstyle.xml" \
+            "--report=${{ env.REPORT_DIR }}sonarqube.json" \
+            "--report=${{ env.REPORT_DIR }}codeclimate.json" \
+            "--report=${{ env.REPORT_DIR }}summary.json" \
+            "--report=${{ env.REPORT_DIR }}junit.xml" \
           ) && \
           "${dynamic_command[@]}"
 
