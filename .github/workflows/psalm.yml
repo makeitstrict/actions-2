@@ -64,11 +64,10 @@ jobs:
           );
           "${dynamic_command[@]}";
           psalm_result=$?;
-          if [ '${{ inputs.strict }}' = 'true' && $psalm_result != 0 ]
-          then
-             exit $psalm_result;
+          if [ '${{ inputs.strict }}' -eq 'true' ] && [ $psalm_result -ne 0 ];
+            then exit $psalm_result;
           fi;
-          ls -lah ${{ env.REPORT_DIR }}
+          ls -lah ${{ env.REPORT_DIR }};
 
       - uses: actions/upload-artifact@v3
         with:
