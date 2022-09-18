@@ -20,7 +20,7 @@ on:
         type: string
         description: 'Release tag of tool'
         required: false
-        default: 'latest'
+        default: '~4.27'
       reports-artifact-name:
         type: string
         required: false
