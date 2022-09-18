@@ -49,15 +49,6 @@ jobs:
           composer install --no-interaction --no-progress --quiet --prefer-dist;
           mkdir -p ${{ env.REPORT_DIR }};
 
-      # - name: 'Installing Psalm'
-      #   run: |
-      #     wget \
-      #       -O /usr/local/bin/psalm \
-      #       https://github.com/vimeo/psalm/releases/download/${{ inputs.version-constraint }}/psalm.phar; \
-      #     chmod +x /usr/local/bin/psalm; \
-      #     psalm --version; \
-      #     mkdir -p ${{ env.REPORT_DIR }};
-
       - name: 'Executing Psalm'
         run: |
           dynamic_command=(
@@ -65,9 +56,9 @@ jobs:
             "--config=${{ inputs.configuration }}"
             "--memory-limit=-1"
             "--threads=$(nproc)"
-            "--long-progress"
             "--no-cache"
             "--output-format=github"
+            "-vvv"
             "--report=${{ env.REPORT_DIR }}psalm.sarif"
             "--report=${{ env.REPORT_DIR }}sonarqube.json"
             "--report=${{ env.REPORT_DIR }}codeclimate.json"
