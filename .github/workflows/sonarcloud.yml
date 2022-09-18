@@ -7,8 +7,6 @@ on:
         type: string
         required: false
     secrets:
-      GITHUB_TOKEN:
-        required: true
       SONAR_TOKEN:
         required: true
 
@@ -53,7 +51,7 @@ jobs:
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@v1.6
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ github.token }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
           args: ${{ steps.sonar-config.outputs.result }}
