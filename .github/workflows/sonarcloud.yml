@@ -1,0 +1,53 @@
+name: 'SonarCloud'
+
+on:
+  workflow_call:
+    inputs:
+      psalm-artifact-name:
+        type: string
+        required: false
+
+env:
+  PSALM_REPORT_DIR: /tmp/${{ github.run_id }}/psalm/
+
+jobs:
+  run:
+    permissions:
+      contents: read
+    name: 'Running Psalm'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: 'Installing PHP'
+        uses: shivammathur/setup-php@v2
+        with:
+          tools: composer
+
+      - name: 'Installing dependencies'
+        run: |
+          composer install --no-interaction --no-progress --prefer-dist && \
+          composer dump-autoload --optimize --strict-psr
+
+      - uses: actions/download-artifact@v3
+        if: inputs.psalm-artifact-name != ''
+        with:
+          name: ${{ inputs.psalm-artifact-name }}
+          path: ${{ env.PSALM_REPORT_DIR }}
+
+      - name: 'Build Sonar config'
+        id: 'sonar-config'
+        run: |
+          config="" && \
+          if [[ -n "${{ inputs.psalm-artifact-name }}" ]] then \
+            config+="sonar.php.psalm.reportPaths=${{ env.PSALM_REPORT_DIR }}sonarqube.json\n" \
+          fi && \
+          echo "::set-output name=result::${config}"
+
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@v1.6
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          args: ${{ steps.sonar-config.outputs.result }}
