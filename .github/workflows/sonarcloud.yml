@@ -6,6 +6,12 @@ on:
       psalm-artifact-name:
         type: string
         required: false
+    secrets:
+      GITHUB_TOKEN:
+        required: true
+      SONAR_TOKEN:
+        required: true
+
 
 env:
   PSALM_REPORT_DIR: /tmp/${{ github.run_id }}/psalm/
@@ -39,9 +45,11 @@ jobs:
         id: 'sonar-config'
         run: |
           config="";
-          if [[ -n "${{ inputs.psalm-artifact-name }}" ]]
-          then
-            config+="sonar.php.psalm.reportPaths=${{ env.PSALM_REPORT_DIR }}sonarqube.json\n";
+          if [ -n "${{ inputs.psalm-artifact-name }}" ];
+            then config+="sonar.php.psalm.reportPaths=${{ env.PSALM_REPORT_DIR }}sonarqube.json\n";
+          fi;
+          if [ -n "${{ inputs.psalm-artifact-name }}" ];
+            then config+="sonar.php.psalm.reportPaths=${{ env.PSALM_REPORT_DIR }}sonarqube.json\n";
           fi;
           echo "::set-output name=result::${config}";
 

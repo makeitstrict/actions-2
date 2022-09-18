@@ -67,7 +67,6 @@ jobs:
           if [ '${{ inputs.strict }}' = 'true' ] && [ $psalm_result -ne 0 ];
             then exit $psalm_result;
           fi;
-          ls -lah ${{ env.REPORT_DIR }};
 
       - uses: actions/upload-artifact@v3
         with:
