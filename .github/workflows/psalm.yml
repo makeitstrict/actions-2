@@ -1,3 +1,7 @@
+# Flow
+# 1. Checkout, install PHP and Composer
+# 2. 
+
 name: 'Psalm'
 
 on:
@@ -5,13 +9,21 @@ on:
     inputs:
       configuration:
         type: string
+        required: false
         default: './psalm.dist.xml'
+      strict:
+        type: boolean
+        description: 'Will fail job if Psalm found some errors (default behavior)'
+        required: false
+        default: true
       version:
         type: string
+        description: 'Release tag of tool'
+        required: false
         default: 'latest'
-        required: true
       reports-artifact-name:
         type: string
+        required: false
         default: 'psalm-reports'
 
 env:
@@ -33,36 +45,36 @@ jobs:
 
       - name: 'Installing dependencies'
         run: |
-          composer install --no-interaction --no-progress --prefer-dist && \
-          composer dump-autoload --optimize --strict-psr
+          composer install --no-interaction --no-progress --prefer-dist
 
       - name: 'Installing Psalm'
         run: |
           wget \
             -O /usr/local/bin/psalm \
-            https://github.com/vimeo/psalm/releases/download/${{ inputs.version }}/psalm.phar && \
-          chmod +x /usr/local/bin/psalm && \
-          psalm --version && \
-          mkdir -p ${{ env.REPORT_DIR }}
+            https://github.com/vimeo/psalm/releases/download/${{ inputs.version }}/psalm.phar; \
+          chmod +x /usr/local/bin/psalm; \
+          psalm --version; \
+          mkdir -p ${{ env.REPORT_DIR }};
 
       - name: 'Executing Psalm'
         run: |
-          dynamic_command=( \
-            "psalm" \
-            "--config=${{ inputs.configuration }}" \
-            "--memory-limit=-1" \
-            "--threads=$(nproc)" \
-            "--long-progress" \
-            "--no-cache" \
-            "--output-format=github" \
-            "--report=${{ env.REPORT_DIR }}psalm.sarif" \
-            "--report=${{ env.REPORT_DIR }}checkstyle.xml" \
-            "--report=${{ env.REPORT_DIR }}sonarqube.json" \
-            "--report=${{ env.REPORT_DIR }}codeclimate.json" \
-            "--report=${{ env.REPORT_DIR }}summary.json" \
-            "--report=${{ env.REPORT_DIR }}junit.xml" \
-          ) && \
-          "${dynamic_command[@]}"
+          dynamic_command=(
+            "psalm"
+            "--config=${{ inputs.configuration }}"
+            "--memory-limit=-1"
+            "--threads=$(nproc)"
+            "--long-progress"
+            "--no-cache"
+            "--output-format=github"
+            "--report=${{ env.REPORT_DIR }}psalm.sarif"
+            "--report=${{ env.REPORT_DIR }}checkstyle.xml"
+            "--report=${{ env.REPORT_DIR }}sonarqube.json"
+            "--report=${{ env.REPORT_DIR }}codeclimate.json"
+            "--report=${{ env.REPORT_DIR }}summary.json"
+            "--report=${{ env.REPORT_DIR }}junit.xml"
+          );
+          ([ '${{ inputs.strict }}' = 'false' ] && '');
+          "${dynamic_command[@]}";
 
       - uses: actions/upload-artifact@v3
         if: always()
