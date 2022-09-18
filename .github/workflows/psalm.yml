@@ -50,6 +50,7 @@ jobs:
           mkdir -p ${{ env.REPORT_DIR }};
 
       - name: 'Executing Psalm'
+        shell: bash {0}
         run: |
           dynamic_command=(
             "psalm"
