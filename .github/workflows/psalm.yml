@@ -43,19 +43,19 @@ jobs:
         with:
           tools: composer
 
-      - name: 'Installing dependencies'
+      - name: 'Installing Psalm & dependencies'
         run: |
           composer global require vimeo/psalm:${{ inputs.version-constraint }}
           composer install --no-interaction --no-progress --prefer-dist
 
-      - name: 'Installing Psalm'
-        run: |
-          wget \
-            -O /usr/local/bin/psalm \
-            https://github.com/vimeo/psalm/releases/download/${{ inputs.version-constraint }}/psalm.phar; \
-          chmod +x /usr/local/bin/psalm; \
-          psalm --version; \
-          mkdir -p ${{ env.REPORT_DIR }};
+      # - name: 'Installing Psalm'
+      #   run: |
+      #     wget \
+      #       -O /usr/local/bin/psalm \
+      #       https://github.com/vimeo/psalm/releases/download/${{ inputs.version-constraint }}/psalm.phar; \
+      #     chmod +x /usr/local/bin/psalm; \
+      #     psalm --version; \
+      #     mkdir -p ${{ env.REPORT_DIR }};
 
       - name: 'Executing Psalm'
         run: |
