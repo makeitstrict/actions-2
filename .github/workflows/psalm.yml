@@ -67,11 +67,8 @@ jobs:
             "--no-cache"
             "--output-format=github"
             "--report=${{ env.REPORT_DIR }}psalm.sarif"
-            "--report=${{ env.REPORT_DIR }}checkstyle.xml"
             "--report=${{ env.REPORT_DIR }}sonarqube.json"
             "--report=${{ env.REPORT_DIR }}codeclimate.json"
-            "--report=${{ env.REPORT_DIR }}summary.json"
-            "--report=${{ env.REPORT_DIR }}junit.xml"
           );
           if [ '${{ inputs.strict }}' = 'false' ]
           then
