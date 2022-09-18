@@ -45,8 +45,9 @@ jobs:
 
       - name: 'Installing Psalm & dependencies'
         run: |
-          composer global require --no-interaction --quiet  --prefer-dist vimeo/psalm:${{ inputs.version-constraint }}
-          composer install --no-interaction --no-progress --quiet --prefer-dist
+          composer global require --no-interaction --quiet  --prefer-dist vimeo/psalm:${{ inputs.version-constraint }};
+          composer install --no-interaction --no-progress --quiet --prefer-dist;
+          mkdir -p ${{ env.REPORT_DIR }};
 
       # - name: 'Installing Psalm'
       #   run: |
@@ -80,7 +81,6 @@ jobs:
           ls -lah ${{ env.REPORT_DIR }}
 
       - uses: actions/upload-artifact@v3
-        if: always()
         with:
           name: ${{ inputs.reports-artifact-name }}
           path: ${{ env.REPORT_DIR }}
