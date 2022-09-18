@@ -45,8 +45,8 @@ jobs:
 
       - name: 'Installing Psalm & dependencies'
         run: |
-          composer global require vimeo/psalm:${{ inputs.version-constraint }}
-          composer install --no-interaction --no-progress --prefer-dist
+          composer global require --no-interaction --quiet  --prefer-dist vimeo/psalm:${{ inputs.version-constraint }}
+          composer install --no-interaction --no-progress --quiet --prefer-dist
 
       # - name: 'Installing Psalm'
       #   run: |
