@@ -61,13 +61,12 @@ jobs:
             "--output-format=github"
             "--report=${{ env.REPORT_DIR }}psalm.sarif"
             "--report=${{ env.REPORT_DIR }}sonarqube.json"
-            "--report=${{ env.REPORT_DIR }}codeclimate.json"
           );
-          if [ '${{ inputs.strict }}' = 'false' ]
+          "${dynamic_command[@]}";
+          psalm_result=$?;
+          if [ '${{ inputs.strict }}' = 'true' && $psalm_result != 0 ]
           then
-            "${dynamic_command[@]}" | true;
-          else
-            "${dynamic_command[@]}";
+             exit $psalm_result;
           fi;
           ls -lah ${{ env.REPORT_DIR }}
 
