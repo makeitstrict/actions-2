@@ -40,7 +40,7 @@ jobs:
         run: |
           wget \
             -O /usr/local/bin/psalm \
-            https://github.com/vimeo/psalm/releases/${{ inputs.version }}/download/psalm.phar && \
+            https://github.com/vimeo/psalm/releases/download/${{ inputs.version }}/psalm.phar && \
           chmod +x /usr/local/bin/psalm && \
           psalm --version && \
           mkdir -p ${{ env.REPORT_DIR }}
