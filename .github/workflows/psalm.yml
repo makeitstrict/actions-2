@@ -58,7 +58,6 @@ jobs:
             "--threads=$(nproc)"
             "--no-cache"
             "--output-format=github"
-            "-vvv"
             "--report=${{ env.REPORT_DIR }}psalm.sarif"
             "--report=${{ env.REPORT_DIR }}sonarqube.json"
             "--report=${{ env.REPORT_DIR }}codeclimate.json"
