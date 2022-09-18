@@ -16,7 +16,7 @@ on:
         description: 'Will fail job if Psalm found some errors (default behavior)'
         required: false
         default: true
-      version:
+      version-constraint:
         type: string
         description: 'Release tag of tool'
         required: false
@@ -45,13 +45,14 @@ jobs:
 
       - name: 'Installing dependencies'
         run: |
+          composer global require vimeo/psalm:${{ inputs.version-constraint }}
           composer install --no-interaction --no-progress --prefer-dist
 
       - name: 'Installing Psalm'
         run: |
           wget \
             -O /usr/local/bin/psalm \
-            https://github.com/vimeo/psalm/releases/download/${{ inputs.version }}/psalm.phar; \
+            https://github.com/vimeo/psalm/releases/download/${{ inputs.version-constraint }}/psalm.phar; \
           chmod +x /usr/local/bin/psalm; \
           psalm --version; \
           mkdir -p ${{ env.REPORT_DIR }};
