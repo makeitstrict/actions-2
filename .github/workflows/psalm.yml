@@ -73,7 +73,7 @@ jobs:
             "--report=${{ env.REPORT_DIR }}summary.json"
             "--report=${{ env.REPORT_DIR }}junit.xml"
           );
-          ([ '${{ inputs.strict }}' = 'false' ] && '');
+          [ '${{ inputs.strict }}' = 'false' ] && dynamic_command+=( "|" "true" );
           "${dynamic_command[@]}";
 
       - uses: actions/upload-artifact@v3
