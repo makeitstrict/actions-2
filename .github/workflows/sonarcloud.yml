@@ -6,13 +6,24 @@ on:
       psalm-artifact-name:
         type: string
         required: false
+      psalm-report-name:
+        type: string
+        required: false
+        default: 'sonarqube.json'
+      coverage-artifact-name:
+        type: string
+        required: false
+      coverage-report-name:
+        type: string
+        required: false
+        default: 'clover.xml'
     secrets:
       sonar-token:
         required: true
 
 
 env:
-  PSALM_REPORT_DIR: /tmp/${{ github.run_id }}/psalm/
+  PSALM_REPORT_DIR: /tmp/${{ github.run_id }}/
 
 jobs:
   run:
@@ -22,6 +33,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
       - name: 'Installing PHP'
         uses: shivammathur/setup-php@v2
@@ -42,9 +55,13 @@ jobs:
       - name: 'Build Sonar config'
         id: 'sonar-config'
         run: |
+          ls -la ${{ env.PSALM_REPORT_DIR }}
           config="";
-          if [ -n "${{ inputs.psalm-artifact-name }}" ];
-            then config+="-Dsonar.php.psalm.reportPaths=${{ env.PSALM_REPORT_DIR }}sonarqube.json\n";
+          if [ -n "${{ inputs.psalm-artifact-name }}" ] && [ -n "${{ inputs.psalm-report-name }}" ];
+            then config+="-Dsonar.php.psalm.reportPaths=${{ env.PSALM_REPORT_DIR }}${{ inputs.psalm-report-name }}\n";
+          fi;
+          if [ -n "${{ inputs.coverage-artifact-name }}" ] && [ -n "${{ inputs.coverage-report-name }}" ];
+            then config+="-Dsonar.php.coverage.reportPaths=${{ env.PSALM_REPORT_DIR }}${{ inputs.coverage-report-name }}\n";
           fi;
           echo -e "::set-output name=result::${config}";
 
