@@ -16,7 +16,7 @@ jobs:
     name: 'Testing on PHP ${{ matrix.php }}. Dependencies: ${{ matrix.dependencies }}'
     runs-on: ${{ matrix.platform }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - uses: shivammathur/setup-php@v2
         with:
