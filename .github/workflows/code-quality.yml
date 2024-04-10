@@ -18,7 +18,7 @@ jobs:
           composer install --no-interaction --no-progress
       - continue-on-error: true
         run: vendor/bin/psalm --output-format=github --report=/tmp/psalm/report.sarif
-      - uses: github/codeql-action/upload-sarif@v2
+      - uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: /tmp/psalm/report.sarif
   psalm-security:
@@ -35,6 +35,6 @@ jobs:
           composer install --no-interaction --no-progress
       - continue-on-error: true
         run: vendor/bin/psalm --taint-analysis --output-format=github --report=/tmp/psalm/report.sarif
-      - uses: github/codeql-action/upload-sarif@v2
+      - uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: /tmp/psalm/report.sarif
