@@ -1,0 +1,75 @@
+# Flow
+# 1. Checkout, install PHP and Composer
+# 2. 
+
+name: 'Psalm'
+
+on:
+  workflow_call:
+    inputs:
+      configuration:
+        type: string
+        required: false
+        default: './psalm.dist.xml'
+      strict:
+        type: boolean
+        description: 'Will fail job if Psalm found some errors (default behavior)'
+        required: false
+        default: true
+      version-constraint:
+        type: string
+        description: 'Release tag of tool'
+        required: false
+        default: '~4.27'
+      reports-artifact-name:
+        type: string
+        required: false
+        default: 'psalm-reports'
+
+env:
+  REPORT_DIR: /tmp/${{ github.run_id }}/
+
+jobs:
+  run:
+    permissions:
+      contents: read
+    name: 'Running Psalm'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: 'Installing PHP'
+        uses: shivammathur/setup-php@v2
+        with:
+          tools: composer
+
+      - name: 'Installing Psalm & dependencies'
+        run: |
+          composer global require --no-interaction --quiet  --prefer-dist vimeo/psalm:${{ inputs.version-constraint }};
+          composer install --no-interaction --no-progress --quiet --prefer-dist;
+          mkdir -p ${{ env.REPORT_DIR }};
+
+      - name: 'Executing Psalm'
+        shell: bash {0}
+        run: |
+          dynamic_command=(
+            "psalm"
+            "--config=${{ inputs.configuration }}"
+            "--memory-limit=-1"
+            "--threads=$(nproc)"
+            "--no-cache"
+            "--output-format=github"
+            "--report=${{ env.REPORT_DIR }}psalm.sarif"
+            "--report=${{ env.REPORT_DIR }}sonarqube.json"
+          );
+          "${dynamic_command[@]}";
+          psalm_result=$?;
+          if [ '${{ inputs.strict }}' = 'true' ] && [ $psalm_result -ne 0 ];
+            then exit $psalm_result;
+          fi;
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: ${{ inputs.reports-artifact-name }}
+          path: ${{ env.REPORT_DIR }}
+          if-no-files-found: error

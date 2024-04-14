@@ -1,0 +1,74 @@
+name: 'SonarCloud'
+
+on:
+  workflow_call:
+    inputs:
+      psalm-artifact-name:
+        type: string
+        required: false
+      psalm-report-name:
+        type: string
+        required: false
+        default: 'sonarqube.json'
+      coverage-artifact-name:
+        type: string
+        required: false
+      coverage-report-name:
+        type: string
+        required: false
+        default: 'clover.xml'
+    secrets:
+      sonar-token:
+        required: true
+
+
+env:
+  PSALM_REPORT_DIR: /tmp/${{ github.run_id }}/
+
+jobs:
+  run:
+    permissions:
+      contents: read
+    name: 'Running SonarCloud Scan'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: 'Installing PHP'
+        uses: shivammathur/setup-php@v2
+        with:
+          tools: composer
+
+      - name: 'Installing dependencies'
+        run: |
+          composer install --no-interaction --no-progress --prefer-dist && \
+          composer dump-autoload --optimize --strict-psr
+
+      - uses: actions/download-artifact@v3
+        if: inputs.psalm-artifact-name != ''
+        with:
+          name: ${{ inputs.psalm-artifact-name }}
+          path: ${{ env.PSALM_REPORT_DIR }}
+
+      - name: 'Build Sonar config'
+        id: 'sonar-config'
+        run: |
+          ls -la ${{ env.PSALM_REPORT_DIR }}
+          config="";
+          if [ -n "${{ inputs.psalm-artifact-name }}" ] && [ -n "${{ inputs.psalm-report-name }}" ];
+            then config+="-Dsonar.php.psalm.reportPaths=${{ env.PSALM_REPORT_DIR }}${{ inputs.psalm-report-name }}\n";
+          fi;
+          if [ -n "${{ inputs.coverage-artifact-name }}" ] && [ -n "${{ inputs.coverage-report-name }}" ];
+            then config+="-Dsonar.php.coverage.reportPaths=${{ env.PSALM_REPORT_DIR }}${{ inputs.coverage-report-name }}\n";
+          fi;
+          echo -e "::set-output name=result::${config}";
+
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@v1.6
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          SONAR_TOKEN: ${{ secrets.sonar-token }}
+        with:
+          args: ${{ steps.sonar-config.outputs.result }}
