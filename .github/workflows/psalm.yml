@@ -36,7 +36,7 @@ jobs:
     name: 'Running Psalm'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: 'Installing PHP'
         uses: shivammathur/setup-php@v2
