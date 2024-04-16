@@ -46,7 +46,7 @@ jobs:
           composer install --no-interaction --no-progress --prefer-dist && \
           composer dump-autoload --optimize --strict-psr
 
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         if: inputs.psalm-artifact-name != ''
         with:
           name: ${{ inputs.psalm-artifact-name }}
