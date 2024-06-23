@@ -66,7 +66,7 @@ jobs:
           echo -e "::set-output name=result::${config}";
 
       - name: SonarCloud Scan
-        uses: SonarSource/sonarcloud-github-action@v2.1
+        uses: SonarSource/sonarcloud-github-action@v2.3
         env:
           GITHUB_TOKEN: ${{ github.token }}
           SONAR_TOKEN: ${{ secrets.sonar-token }}
